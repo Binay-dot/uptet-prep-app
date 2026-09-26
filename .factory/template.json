@@ -1,0 +1,6 @@
+{
+  "templateVersion": "0.1.0",
+  "templateSource": "app-factory (local, not yet a committed git repo)",
+  "createdAt": "2026-09-26",
+  "note": "Created before the factory repo had its own git history. Once app-factory is a real GitHub repo, update this to its actual commit hash so future backports/upgrade-guides can be tracked properly."
+}
