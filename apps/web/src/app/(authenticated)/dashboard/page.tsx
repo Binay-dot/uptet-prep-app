@@ -50,7 +50,12 @@ export default function DashboardPage(): ReactElement {
         </div>
       ) : null}
 
-      <p className="mt-4 text-sm text-gray-600">Quiz start / results UI goes here next.</p>
+      <a
+        href="/quiz"
+        className="mt-4 inline-block rounded-md bg-black px-4 py-2 text-sm font-medium text-white"
+      >
+        Start a practice quiz
+      </a>
     </main>
   );
 }

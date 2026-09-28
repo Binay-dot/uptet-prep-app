@@ -11,13 +11,15 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "generate": "drizzle-kit generate",
-    "migrate": "tsx src/migrate.ts"
+    "migrate": "tsx src/migrate.ts",
+    "seed": "tsx src/seed.ts",
+    "ingest:pyq-2019-p1": "tsx src/ingest-pyq-2019-paper1.ts"
   },
   "dependencies": {
-  "@uptet/contracts": "workspace:*",
-  "dotenv": "^16.4.0",
-  "drizzle-orm": "^0.36.0",
-  "postgres": "^3.4.0"
+    "@uptet/contracts": "workspace:*",
+    "dotenv": "^16.4.0",
+    "drizzle-orm": "^0.36.0",
+    "postgres": "^3.4.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

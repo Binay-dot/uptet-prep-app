@@ -14,6 +14,18 @@ files it points to, before writing or changing any code.
 ## Boundaries (do not violate these without a written decision in docs/decisions/)
 - Browser/mobile client code must never import server or database modules.
 - Domain logic (packages/domain) must never import HTTP, database, or platform modules.
+- The IRT scoring engine (packages/domain/src/scoring/*) is this product's
+  actual differentiator — treat changes to it with more care than
+  anywhere else in the codebase, not less. Any behavior change here
+  (not just a refactor) needs a written ADR in docs/decisions/, same as
+  any other architectural decision, explaining what changed and why.
+  Never let a "which responses count, and how" decision live untested
+  inside a route handler or service function instead of here — that's
+  literally how the 2026-09-28 bug happened (every quiz scored a fixed
+  75/150 because the scoring-selection logic was buried, untested, in
+  apps/web's service.ts; see docs/decisions/0005). Every scoring change
+  needs a passing regression test in packages/domain/src/__tests__/
+  before it ships, not just a typecheck.
 - Product data is reachable ONLY through the application's own API — never a
   direct client-to-database path.
 - Every operation that reads or writes a private resource must enforce

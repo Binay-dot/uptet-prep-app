@@ -34,7 +34,17 @@ predicted real-exam score. See `docs/architecture.md` and
   useful, even if early estimates are wider/less certain.
 - Items still in "calibration" status (see feature 002) can appear in
   practice quizzes but must not count toward the user's visible ability
-  estimate until they've been promoted out of calibration.
+  estimate until they've been promoted out of calibration. **Update
+  (2026-09-28):** in practice this meant literally zero items counted
+  (the whole bank was calibration-status with no calibration job to
+  promote/estimate difficulty yet), which produced the same fixed
+  predicted score for every user regardless of performance — failing the
+  "gets *something* useful after their first quiz" criterion below far
+  worse than the alternative. See
+  docs/decisions/0005-neutral-difficulty-fallback-for-scoring.md: an
+  uncalibrated item is now scored at a neutral fallback difficulty
+  instead of excluded, which was judged the better reading of this
+  feature's actual intent.
 - Works correctly whether the user is preparing for Paper 1, Paper 2, or
   both — predictions are per-paper.
 

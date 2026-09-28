@@ -64,3 +64,20 @@ in a batch, not mid-task.
   avoids TS having to "print a portable name" for an inferred JSX type at
   all. Cheap enough to just be the default pattern in the factory's
   Next.js page templates.
+
+- [ ] **A "boundaries" rule for the domain/scoring package, not just for
+  auth.** AGENTS.md already had boundary rules for auth/ownership by
+  convention; it didn't have one for "business-critical calculation logic
+  must live in packages/domain, tested, not inlined in a route handler" —
+  and that gap is exactly how a real bug shipped (2026-09-28: every
+  quiz's predicted score was a fixed number for every user, because the
+  "which responses count toward scoring" decision lived untested inside
+  a service function instead of as a pure, tested function in
+  packages/domain). Added a boundaries entry requiring an ADR + passing
+  regression test for any scoring-logic change (see
+  docs/decisions/0005-neutral-difficulty-fallback-for-scoring.md for the
+  concrete example). Worth making this AGENTS.md boundary a standard
+  factory-template entry: any product with a non-trivial "business logic
+  that must not silently degrade" core (pricing, scoring, matching,
+  ranking...) should call it out by name in its boundaries list, not rely
+  on the generic domain-package pattern above to be followed correctly.

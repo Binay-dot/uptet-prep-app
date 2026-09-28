@@ -4,6 +4,7 @@ import {
   estimateAbilityEap,
   estimateAndPredictScore,
   sectionLabelFor,
+  toScoredResponse,
   type ScoredResponse,
 } from "@uptet/domain";
 import type {
@@ -146,12 +147,15 @@ export async function submitQuiz(
   return db.transaction(async (tx) => {
     let rawScore = 0;
     let rawTotal = 0;
-    // For overall + per-section ability estimation. Only items with a
-    // known (non-null) difficulty count — an item still in early
-    // calibration with no measured difficulty yet contributes to *its
-    // own* future calibration (responseCount below) but not to the
-    // student's visible ability estimate, matching the acceptance
-    // criteria in docs/features/002-content-ingestion-and-review.md.
+    // For overall + per-section ability estimation. How a response maps
+    // to a ScoredResponse (including the uncalibrated-item fallback) is
+    // NOT decided here — it's the pure, tested toScoredResponse()
+    // function in packages/domain. See
+    // docs/decisions/0005-neutral-difficulty-fallback-for-scoring.md:
+    // this used to be inline, untested logic here, and that's exactly
+    // how the "every quiz scores 75/150" bug slipped through silently.
+    // Don't inline this again — change toScoredResponse instead, with
+    // its regression test updated to match.
     const scoredBySection = new Map<SectionId, ScoredResponse[]>();
     const allScored: ScoredResponse[] = [];
 
@@ -186,16 +190,14 @@ export async function submitQuiz(
         .set({ responseCount: sql`${schema.questions.responseCount} + 1` })
         .where(eq(schema.questions.id, question.id));
 
-      if (attemptQuestion.difficultyAtAttempt !== null) {
-        const scored: ScoredResponse = {
-          difficulty: attemptQuestion.difficultyAtAttempt,
-          correct: isCorrect,
-        };
-        allScored.push(scored);
-        const existing = scoredBySection.get(question.sectionId) ?? [];
-        existing.push(scored);
-        scoredBySection.set(question.sectionId, existing);
-      }
+      const scored: ScoredResponse = toScoredResponse(
+        attemptQuestion.difficultyAtAttempt,
+        isCorrect,
+      );
+      allScored.push(scored);
+      const existing = scoredBySection.get(question.sectionId) ?? [];
+      existing.push(scored);
+      scoredBySection.set(question.sectionId, existing);
     }
 
     // Promote items that just crossed the calibration threshold. This is
