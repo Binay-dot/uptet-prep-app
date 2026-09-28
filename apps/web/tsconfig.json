@@ -1,0 +1,45 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "preserve",
+    "noEmit": true,
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    // Restricts automatic @types/* pickup to exactly these, resolved from
+    // apps/web's OWN node_modules. Without this, TS's global-ambient-type
+    // scan can walk into apps/mobile's separate (older, React 18)
+    // @types/react in the pnpm store and get confused about which
+    // JSX.Element is "the" one, producing spurious TS2742 errors on every
+    // page/layout component. Each app in this monorepo pins its own React
+    // version on purpose (docs/architecture.md: web and mobile are
+    // separate deployments) — this is what keeps their type checks
+    // actually isolated from each other.
+    "types": ["node", "react", "react-dom"]
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

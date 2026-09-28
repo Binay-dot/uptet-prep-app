@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "UPTET Prep",
+    "slug": "uptet-prep",
+    "scheme": "uptetprep",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "bundleIdentifier": "com.uptetprep.app",
+      "supportsTablet": false
+    },
+    "android": {
+      "package": "com.uptetprep.app"
+    },
+    "plugins": ["expo-router", "expo-secure-store"],
+    "extra": {
+      "router": {
+        "origin": false
+      }
+    }
+  }
+}

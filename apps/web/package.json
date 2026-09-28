@@ -1,0 +1,35 @@
+{
+  "name": "@uptet/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@auth0/nextjs-auth0": "^4.0.0",
+    "dotenv": "^16.4.0",
+    "@uptet/contracts": "workspace:*",
+    "@uptet/database": "workspace:*",
+    "@uptet/domain": "workspace:*",
+    "drizzle-orm": "^0.36.0",
+    "jose": "^5.9.0",
+    "next": "^15.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.6.0"
+  }
+}

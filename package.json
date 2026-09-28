@@ -1,0 +1,37 @@
+{
+  "name": "uptet-prep-app",
+  "private": true,
+  "version": "0.1.0",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @uptet/web dev",
+    "dev:mobile": "pnpm --filter @uptet/mobile start",
+    "build": "pnpm --filter @uptet/web build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "doctor": "tsx tooling/doctor.ts",
+    "db:migrate": "pnpm --filter @uptet/database migrate"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  },
+  "packageManager": "pnpm@9.12.0",
+  "pnpm": {
+    "packageExtensions": {
+      "next": {
+        "peerDependencies": {
+          "@types/react": "*"
+        },
+        "peerDependenciesMeta": {
+          "@types/react": {
+            "optional": true
+          }
+        }
+      }
+    }
+  }
+}
