@@ -22,6 +22,12 @@
  * of a falsely precise number (see SectionBreakdownDto.standardError in
  * packages/contracts).
  *
+ * The exact same degeneracy (and the same EAP fix) applies on the *item*
+ * side during field-testing — see ./itemCalibration.ts, which reuses the
+ * quadrature-grid / normal-density / probabilityCorrect machinery below
+ * rather than re-implementing it, so the 1PL formula has one source of
+ * truth for both directions of the model.
+ *
  * See docs/features/001-quiz-and-score-prediction.md and
  * docs/decisions/0003-content-and-scoring.md for the product-level
  * rationale (including: difficulty parameters are never hand-assigned —
@@ -42,29 +48,39 @@ export interface AbilityEstimateResult {
   standardError: number;
 }
 
-/** Quadrature grid: fixed points across a wide, dense range of plausible theta. */
-const QUADRATURE_MIN = -6;
-const QUADRATURE_MAX = 6;
-const QUADRATURE_STEPS = 121; // step size = 0.1
+/** Quadrature grid: fixed points across a wide, dense range of plausible theta/difficulty. */
+export const QUADRATURE_MIN = -6;
+export const QUADRATURE_MAX = 6;
+export const QUADRATURE_STEPS = 121; // step size = 0.1
 
-function buildQuadratureGrid(): number[] {
+/**
+ * Builds a fixed grid of points over [min, max]. Shared by ability
+ * estimation (grid over theta) and item calibration (grid over
+ * difficulty) — same numerical approach, same source of truth, just a
+ * different free variable held fixed on the other side of the equation.
+ */
+export function buildQuadratureGrid(
+  min: number = QUADRATURE_MIN,
+  max: number = QUADRATURE_MAX,
+  steps: number = QUADRATURE_STEPS,
+): number[] {
   const points: number[] = [];
-  const step = (QUADRATURE_MAX - QUADRATURE_MIN) / (QUADRATURE_STEPS - 1);
-  for (let i = 0; i < QUADRATURE_STEPS; i++) {
-    points.push(QUADRATURE_MIN + i * step);
+  const step = (max - min) / (steps - 1);
+  for (let i = 0; i < steps; i++) {
+    points.push(min + i * step);
   }
   return points;
 }
 
 const QUADRATURE_GRID = buildQuadratureGrid();
 
-/** Standard normal density, used as the prior over theta. */
-function standardNormalDensity(x: number): number {
+/** Standard normal density, used as the prior over theta (or, in item calibration, over difficulty). */
+export function standardNormalDensity(x: number): number {
   return Math.exp(-0.5 * x * x) / Math.sqrt(2 * Math.PI);
 }
 
-/** 1PL probability of a correct response at a given theta. */
-function probabilityCorrect(theta: number, difficulty: number): number {
+/** 1PL probability of a correct response at a given theta/difficulty pair. */
+export function probabilityCorrect(theta: number, difficulty: number): number {
   return 1 / (1 + Math.exp(-(theta - difficulty)));
 }
 

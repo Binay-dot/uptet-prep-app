@@ -139,6 +139,9 @@ importers:
       '@uptet/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@uptet/domain':
+        specifier: workspace:*
+        version: link:../domain
       dotenv:
         specifier: ^16.4.0
         version: 16.4.7

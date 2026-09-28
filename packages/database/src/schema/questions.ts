@@ -58,6 +58,17 @@ export const questions = pgTable(
 
     /** IRT 1PL difficulty (b) parameter. Null until calibrated. */
     difficulty: real("difficulty"),
+    /**
+     * Posterior standard deviation of the difficulty estimate (from
+     * estimateItemDifficultyEap), the item-side counterpart of
+     * sectionAbilityEstimates.standardError. Null until calibrated. See
+     * docs/decisions/0006-item-calibration-job.md — this gates the
+     * calibration -> live promotion alongside responseCount, so an item
+     * with a wildly uncertain estimate (small/lopsided field-test
+     * sample) doesn't get promoted just because it hit a response-count
+     * threshold.
+     */
+    difficultyStandardError: real("difficulty_standard_error"),
     /** Optional discrimination parameter, for a future move to 2PL. Null in v1's 1PL model. */
     discrimination: real("discrimination"),
     /** How many live responses this item has accumulated — drives the calibration -> live transition. */

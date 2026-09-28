@@ -1,10 +1,12 @@
 import { getDb, schema } from "@uptet/database";
-import { and, eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, lte, sql } from "drizzle-orm";
 import {
   estimateAbilityEap,
   estimateAndPredictScore,
   sectionLabelFor,
   toScoredResponse,
+  MIN_RESPONSES_TO_ATTEMPT_CALIBRATION,
+  MAX_STANDARD_ERROR_FOR_LIVE_PROMOTION,
   type ScoredResponse,
 } from "@uptet/domain";
 import type {
@@ -21,16 +23,6 @@ import { SECTIONS_BY_PAPER } from "./paperSections";
 
 const QUESTIONS_PER_SECTION_PRACTICE = 10;
 const QUESTIONS_PER_SECTION_IN_FULL_MOCK = 6;
-
-/**
- * An item only counts toward calibration -> live once it has this many
- * recorded responses. A tuning decision, not a hard number to nail down
- * up front — see docs/features/002-content-ingestion-and-review.md
- * ("start conservative"). Deliberately a small placeholder for v1's early
- * days with a small item bank; revisit once real usage data exists
- * (candidate for docs/feedback/lessons.md once it does).
- */
-const RESPONSES_NEEDED_FOR_LIVE_STATUS = 30;
 
 async function pickQuestionsForSection(
   paperId: StartQuizInput["paperId"],
@@ -200,11 +192,15 @@ export async function submitQuiz(
       scoredBySection.set(question.sectionId, existing);
     }
 
-    // Promote items that just crossed the calibration threshold. This is
-    // a placeholder promotion rule (response count only) — it does NOT
-    // compute a real difficulty estimate from response data. That's a
-    // genuinely separate piece of work (an item-calibration job) that
-    // hasn't been built yet; flagged in docs/feedback/lessons.md.
+    // Promote items that have earned it: enough responses AND a real,
+    // sufficiently-settled difficulty estimate. The actual difficulty
+    // computation happens separately, in the calibrate-items job
+    // (packages/database/src/calibrate-items.ts) — this only decides
+    // whether an item that job has already calibrated is trustworthy
+    // enough to start counting toward users' visible ability estimates.
+    // See docs/decisions/0006-item-calibration-job.md for why the
+    // standard-error condition was added on top of the old
+    // response-count-only rule.
     await tx
       .update(schema.questions)
       .set({ status: "live" })
@@ -212,7 +208,10 @@ export async function submitQuiz(
         and(
           inArray(schema.questions.id, [...questionById.keys()]),
           eq(schema.questions.status, "calibration"),
-          sql`${schema.questions.responseCount} >= ${RESPONSES_NEEDED_FOR_LIVE_STATUS}`,
+          sql`${schema.questions.responseCount} >= ${MIN_RESPONSES_TO_ATTEMPT_CALIBRATION}`,
+          isNotNull(schema.questions.difficulty),
+          isNotNull(schema.questions.difficultyStandardError),
+          lte(schema.questions.difficultyStandardError, MAX_STANDARD_ERROR_FOR_LIVE_PROMOTION),
         ),
       );
 

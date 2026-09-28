@@ -1,0 +1,1 @@
+ALTER TABLE "questions" ADD COLUMN "difficulty_standard_error" real;

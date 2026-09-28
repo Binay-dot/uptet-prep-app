@@ -8,6 +8,13 @@
       "when": 1790527983542,
       "tag": "0000_broad_ben_urich",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790628251673,
+      "tag": "0001_groovy_bastion",
+      "breakpoints": true
     }
   ]
 }
